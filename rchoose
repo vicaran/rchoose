@@ -1,0 +1,99 @@
+#!/usr/bin/env ruby
+USAGE = <<ENDUSAGE
+
+Usage:
+   choose [-h] [[-n number] [-s] [-f file_name] names]
+ENDUSAGE
+
+USAGEMORE = <<ENDUSAGEMORE
+
+Use choose -h for more help
+
+ENDUSAGEMORE
+
+HELP = <<ENDHELP
+
+Select one random name between the ones you put and that are space separated.
+
+The following options are available:
+   -h, --help       Show this help.
+   -n, --number		How many names must be returned.
+   -f, --file    	The path to the file containing the names.
+   -s, --scramble	Scramble the order of the given list of names.
+
+   NOTICE: If you put the -s, --scramble flag, then the -n, --number flag will be discarded
+ENDHELP
+
+
+
+CHOOSEN_ELEMENTS = 1
+unflagged_args = Array.new
+
+ARGS = { :number => 1 } 
+next_arg = :none
+
+if ARGV.length == 0
+	puts USAGE
+	puts USAGEMORE
+	exit
+else
+	ARGV.each { |arg|
+  		case arg
+	    when '-h','--help'      then ARGS[:help]      	= true
+	    when '-s','--scramble'  then ARGS[:scramble]   	= true
+	    when '-f','--file' 		then next_arg = :file
+	    when '-n', '--number'	then next_arg = :number
+    	else
+	    	if next_arg && next_arg != :none
+	        	ARGS[next_arg] = arg
+	        	next_arg = :none
+	        else 
+	        	unflagged_args.push(arg.split.map(&:capitalize).join(' '))
+      		end
+		end
+	}
+end
+
+filtered_args = Array.new
+
+if ARGS[:help]
+  puts USAGE unless ARGS[:version]
+  puts HELP if ARGS[:help]
+  exit
+end
+
+if ARGS[:file]
+  	f = File.open(Dir.pwd + "/" + ARGS[:file], "r")
+  	if f.size > 0
+		f.each_line do |line|
+  			unflagged_args.push(line)
+		end
+	else 
+		puts "Input file is empty. Please input a well formatted not-empty file"
+		exit
+	end
+	f.close 
+end
+
+if ARGS[:scramble]
+  	ARGS[:number] = unflagged_args.size
+end
+
+if ARGS[:number] and Integer(ARGS[:number])
+  	$i = 1
+  	while $i <= Integer(ARGS[:number])
+  		if unflagged_args.size > 0
+	   		element = unflagged_args.sample
+	   		filtered_args.push(element.split.map(&:capitalize).join(' '))
+	   		unflagged_args.delete(element)
+	   		$i +=1;
+	   	else
+	   		break
+	   	end
+	end
+	unflagged_args = filtered_args
+else
+	puts "Value of -n or --number must be declared and must be an Integer"
+end
+
+puts "I choose:\n" + unflagged_args.join("\n")
