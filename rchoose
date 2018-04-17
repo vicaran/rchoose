@@ -1,4 +1,12 @@
 #!/usr/bin/env ruby
+
+class String
+def red;            "\033[31m#{self}\033[0m" end
+def green;          "\033[32m#{self}\033[0m" end
+def yellow;         "\033[93m#{self}\033[0m" end
+def bold;           "\033[1m#{self}\033[0m" end
+end
+
 USAGE = <<ENDUSAGE
 
 Usage:
@@ -96,4 +104,27 @@ else
 	puts "Value of -n or --number must be declared and must be an Integer"
 end
 
-puts "I choose:\n" + unflagged_args.join("\n")
+puts "\nI choose:".bold.yellow
+puts "
+    ,-----------------.
+   (_\\                 \\
+      |                |
+      |                |".yellow
+
+for name in  unflagged_args
+	tail = ""
+	offset = 14 - name.size
+	for i in 1..offset
+		tail+= " "
+	end
+	puts "      |  ".yellow + name.bold + tail + "|".yellow
+end
+
+
+puts "      |                |
+     _|                |
+    (_/_____(*)________/
+             \\\\
+              ))
+              ^
+".yellow
